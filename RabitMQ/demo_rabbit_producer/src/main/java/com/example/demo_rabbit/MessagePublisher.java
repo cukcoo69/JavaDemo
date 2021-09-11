@@ -22,6 +22,7 @@ public class MessagePublisher {
         template.convertAndSend(MQConfig.EXCHANGE,
                 MQConfig.ROUTING_KEY, message);
 
+        System.out.println("Message created!");
         return "Message Published";
     }
 

@@ -1,6 +1,7 @@
 package com.example.demo_rabbit;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -43,5 +44,11 @@ public class MQConfig {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter());
         return template;
+    }
+
+    @RabbitListener(queues =  MQConfig.QUEUE)
+    public void listener(Message message) {
+        System.out.println("Getting message from MQConfig.java!");
+        System.out.println(message);
     }
 }
