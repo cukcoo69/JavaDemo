@@ -4,6 +4,8 @@ import com.example.redis_demo.entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.web.bind.annotation.*;
 import com.example.redis_demo.repository.ProductDao;
 
@@ -15,6 +17,18 @@ import java.util.List;
 public class RedisDemoApplication {
     @Autowired
     private ProductDao dao;
+
+    @Autowired
+    private RedisTemplate template;
+
+    @Autowired
+    private ChannelTopic topic;
+
+    @PostMapping("/message")
+    public String publish(@RequestBody Product product) {
+        template.convertAndSend(topic.getTopic(), product.toString());
+        return "Event published!!";
+    }
 
     @PostMapping
     public Product save(@RequestBody Product product) {
