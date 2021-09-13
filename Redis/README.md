@@ -3,7 +3,7 @@ Spring Redis is introduced with many features: is an open-source in-memory data 
 Supporting various data structures such as strings, hashes, lists, sets, sorted sets with range queries, bitmaps, hyperloglogs, geospatial indexes with radius queries and streams.
 
  - One thing to notice is we need Redis server running in you local to run this demo. I use docker to run a container
- an map port 6379 of Redis to a local port
+ and map port 6379 of Redis to a local port - this port is use to config in RedisConig.java
  
  ------------------------------------------
  https://www.educba.com/rabbitmq-vs-redis/

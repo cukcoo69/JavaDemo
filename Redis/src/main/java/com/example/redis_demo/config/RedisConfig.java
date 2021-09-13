@@ -45,6 +45,8 @@ public class RedisConfig {
 //        return template;
 //    }
 
+    // Hai kiểu config redisTemplate() nay chạy thử đều thấy ok, CRUD vẫn chạy, message vẫn chạy
+
     @Bean
     //Cho primary vì ứng dụng báo lỗi có 2 bean. Bean còn lại là do Redis tạo tự động thì phải.
     // Ko biết có ảnh hưởng gì hay ko, cái này dùng để cho message pubsub
