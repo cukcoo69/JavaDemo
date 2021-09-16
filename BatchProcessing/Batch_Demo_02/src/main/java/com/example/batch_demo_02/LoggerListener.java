@@ -16,6 +16,7 @@ public class LoggerListener implements JobExecutionListener, StepExecutionListen
     @Override
     public void afterJob(JobExecution jobExecution) {
         System.out.printf((END_MESSAGE) + "%n", jobExecution.getJobInstance().getJobName(), jobExecution.getStatus());
+
     }
 
     @BeforeStep

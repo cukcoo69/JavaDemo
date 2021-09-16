@@ -1,10 +1,13 @@
 package com.example.batch_demo_02;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -12,68 +15,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @SpringBootApplication
-@EnableBatchProcessing
+@EnableScheduling
 public class BatchDemo02Application {
 
     @Autowired
-    public JobBuilderFactory jobBuilderFactory;
+    public JobLauncher jobLauncher;
 
     @Autowired
-    public StepBuilderFactory stepBuilderFactory;
+    public Job job;
 
-    @Bean
-    public Job job() {
-        return this.jobBuilderFactory.get("demo_job_01")
-                .start(step01())
-                .listener(new LoggerListener())
-                .build();
-    }
+    @Scheduled(cron = "0 */1 * * * ?")
+    public BatchStatus run() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+        Map<String, JobParameter> maps = new HashMap<>();
+        maps.put("time", new JobParameter(new Date().getTime()));
+        // We are calling a job with name is defined in application file and jobParameters is 1 value => if we call this
+        // end-point again, it'll throw exception due to a job instance is difference from other by NAME and JOB PARAMETERS
+        JobParameters jobParameters = new JobParameters(maps);
+        JobExecution jobExecution =  jobLauncher.run(job, jobParameters);
 
-    private Step step01() {
-        return this.stepBuilderFactory.get("demo_step_01")
-                .tasklet((contribution, chunkContext) -> {
-                    System.out.println("Hello The World");
-                    return RepeatStatus.FINISHED;
-                })
-                .listener(new LoggerListener())
-                .build();
-    }
-
-    @Bean
-    public Job chunkBasedJob() {
-        return this.jobBuilderFactory.get("chunkBasedJob")
-                .start(chunkStep())
-                .build();
-    }
-    @Bean
-    public Step chunkStep() {
-        return this.stepBuilderFactory.get("chunkStep")
-                .<String, String>chunk(3)
-                .reader(itemReader())
-                .writer(itemWriter())
-                .build();
-    }
-    @Bean
-    public ListItemReader<String> itemReader() {
-        List<String> items = new ArrayList<>(10);
-        for (int i = 0; i < 10; i++) {
-            items.add(UUID.randomUUID().toString());
+        System.out.println("Batch is running!!!");
+        while (jobExecution.isRunning()){
+            System.out.println("....");
         }
-        return new ListItemReader<>(items);
-    }
-    @Bean
-    public ItemWriter<String> itemWriter() {
-        return items -> {
-            for (String item : items) {
-                System.out.println(">> current item = " + item);
-            }
-        };
+        System.out.println("Batch completed!");
+
+        return jobExecution.getStatus();
     }
 
     public static void main(String[] args) {

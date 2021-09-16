@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class Controller {
     @GetMapping("run")
     public BatchStatus run() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         Map<String, JobParameter> maps = new HashMap<>();
-        maps.put("time", new JobParameter(1L));
+        maps.put("time", new JobParameter(new Date().getTime()));
         // We are calling a job with name is defined in application file and jobParameters is 1 value => if we call this
         // end-point again, it'll throw exception due to a job instance is difference from other by NAME and JOB PARAMETERS
         JobParameters jobParameters = new JobParameters(maps);
