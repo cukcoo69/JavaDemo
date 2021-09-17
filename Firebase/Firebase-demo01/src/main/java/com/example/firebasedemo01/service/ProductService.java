@@ -5,8 +5,13 @@ import com.google.api.core.ApiFunction;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.protobuf.Api;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -18,6 +23,7 @@ public class ProductService {
         if (isExisted(product.getName())) {
             return "Product name is duplicated";
         }
+        product.setName(product.getName().toUpperCase());
         Firestore dbFirestore = FirestoreClient.getFirestore();
         DocumentReference collectionApiFuture = dbFirestore.collection(COLLECTION_NAME).document();
         // Trick is here, get id of doc then ad to entity data
@@ -38,6 +44,22 @@ public class ProductService {
         } else {
             return null;
         }
+    }
+
+    public List<Product> getAllDetail() throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        Iterable<DocumentReference> documentReferences = dbFirestore.collection(COLLECTION_NAME).listDocuments();
+        Iterator<DocumentReference> iterator = documentReferences.iterator();
+        List<Product> productList = new ArrayList<>();
+        Product product = null;
+        while (iterator.hasNext()) {
+            DocumentReference documentReference = iterator.next();
+            ApiFuture<DocumentSnapshot> future = documentReference.get();
+            DocumentSnapshot document = future.get();
+            product = document.toObject(Product.class);
+            productList.add(product);
+        }
+        return productList;
     }
 
     public String update(Product product) throws ExecutionException, InterruptedException {

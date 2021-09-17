@@ -5,6 +5,7 @@ import com.example.firebasedemo01.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -21,6 +22,11 @@ public class ProductController {
     @GetMapping("/products/{name}")
     public Product getProductDetail(@PathVariable String name) throws ExecutionException, InterruptedException {
         return productService.getDetailByName(name);
+    }
+
+    @GetMapping("/products")
+    public List<Product> listProduct() throws ExecutionException, InterruptedException {
+        return productService.getAllDetail();
     }
 
     @DeleteMapping("/products/{name}")
