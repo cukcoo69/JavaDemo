@@ -1,11 +1,9 @@
 package com.example.firebasedemo01.service;
 
 import com.example.firebasedemo01.entity.Product;
-import com.google.api.core.ApiFunction;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
-import com.google.protobuf.Api;
 import org.springframework.stereotype.Service;
 
 import javax.print.Doc;
@@ -20,7 +18,7 @@ public class ProductService {
     private static final String COLLECTION_NAME = "products";
 
     public String save(Product product) throws ExecutionException, InterruptedException {
-        if (isExisted(product.getName())) {
+        if (isExisted(product.getName().toUpperCase())) {
             return "Product name is duplicated";
         }
         product.setName(product.getName().toUpperCase());
@@ -64,7 +62,7 @@ public class ProductService {
 
     public String update(Product product) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionApiFuture = dbFirestore.collection(COLLECTION_NAME).document().set(product);
+        ApiFuture<WriteResult> collectionApiFuture = dbFirestore.collection(COLLECTION_NAME).document(product.getId()).set(product);
         return collectionApiFuture.get().getUpdateTime().toString();
     }
 
